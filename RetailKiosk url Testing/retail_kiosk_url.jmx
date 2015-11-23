@@ -61,9 +61,14 @@
         <hashTree/>
         <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
           <collectionProp name="Arguments.arguments">
+            <elementProp name="env" elementType="Argument">
+              <stringProp name="Argument.name">env</stringProp>
+              <stringProp name="Argument.value">ecwebs01</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
             <elementProp name="url" elementType="Argument">
               <stringProp name="Argument.name">url</stringProp>
-              <stringProp name="Argument.value">ecwebs01.llbean.com/shop/retailKiosk.html?qs=${IPAD_CODE}-kiosk</stringProp>
+              <stringProp name="Argument.value">{env}.llbean.com/shop/retailKiosk.html?qs=${IPAD_CODE}-kiosk</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
           </collectionProp>
@@ -78,7 +83,7 @@ var wait = new support_ui.WebDriverWait(WDS.browser, 60);
 WDS.sampleResult.sampleStart();
 
 //Gets the url that the store has
-WDS.browser.get(&apos;http://ecwebs01.llbean.com/shop/retailKiosk.html?qs=${ipad_code}-kiosk&apos;);
+WDS.browser.get(&apos;http://${env}.llbean.com/shop/retailKiosk.html?qs=${ipad_code}-kiosk&apos;);
 WDS.log.info(&apos;&lt;&lt;&lt; Store #${ipad_code} &gt;&gt;&gt;&apos;);
 
 //Finds the link_id element and clicks it to execute the js
