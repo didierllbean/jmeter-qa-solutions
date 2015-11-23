@@ -73,7 +73,7 @@
           <stringProp name="WebDriverSampler.script">//Import selenium, webdriver, and sets a wait time
 var pkg = JavaImporter(org.openqa.selenium);
 var support_ui = JavaImporter(org.openqa.selenium.support.ui.WebDriverWait);
-var wait = new support_ui.WebDriverWait(WDS.browser, 6000);
+var wait = new support_ui.WebDriverWait(WDS.browser, 60);
 
 WDS.sampleResult.sampleStart();
 
