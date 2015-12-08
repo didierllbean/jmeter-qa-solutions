@@ -71,6 +71,11 @@
               <stringProp name="Argument.value">{env}.llbean.com/shop/retailKiosk.html?qs=${IPAD_CODE}-kiosk</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
+            <elementProp name="pageNotLoaded" elementType="Argument">
+              <stringProp name="Argument.name">pageNotLoaded</stringProp>
+              <stringProp name="Argument.value">false</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
           </collectionProp>
         </Arguments>
         <hashTree/>
@@ -78,34 +83,47 @@
           <stringProp name="WebDriverSampler.script">//Import selenium, webdriver, and sets a wait time
 var pkg = JavaImporter(org.openqa.selenium);
 var support_ui = JavaImporter(org.openqa.selenium.support.ui.WebDriverWait);
-//var wait = new support_ui.WebDriverWait(WDS.browser, 60);
+var wait = new support_ui.WebDriverWait(WDS.browser, 60);
+
+var vars = org.apache.jmeter.threads.JMeterContextService.getContext().getVariables()
 
 WDS.sampleResult.sampleStart();
 
-//Gets the url that the store has
-WDS.browser.get(&apos;http://${env}.llbean.com/shop/retailKiosk.html?qs=${ipad_code}-kiosk&apos;);
-WDS.log.info(&apos;&lt;&lt;&lt; Store #${ipad_code} &gt;&gt;&gt;&apos;);
+try{
+    
+    //Gets the url that the store has
+    WDS.browser.get(&apos;http://${env}.llbean.com/shop/retailKiosk.html?qs=${ipad_code}-kiosk&apos;);
+    WDS.log.info(&apos;&lt;&lt;&lt; Store #${ipad_code} &gt;&gt;&gt;&apos;);
+    
+    //Finds the link_id element and clicks it to execute the js
+    var link = WDS.browser.findElement(pkg.By.id(&apos;link_id&apos;));
+    link.click();
+    
+    //This is the excepted url to compare to
+    var url = &apos;https://www.llbeanrewards.com/apply/Landing.action?campaignId=${campaign_id}&amp;cellNumber=${cell_code}&amp;storenumber=${ipad_code}&apos;;
+    //Url that the js generated
+    var browser_url = WDS.browser.getCurrentUrl();
+    
+    WDS.log.info(&apos;Expected URL: &apos; + url);
+    WDS.log.info(&apos;Current  URL: &apos; + browser_url);
+    
+    if(url!=browser_url){
+        WDS.sampleResult.successful = false;
+        WDS.sampleResult.responseMessage = &apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;+&apos;\tURL = &apos;+browser_url;
+        WDS.log.info(&apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;); 
+    }else{
+        WDS.log.info(&apos;SUCCESS!\n&apos;); 
+        WDS.sampleResult.successful = true;
+    }
 
-//Finds the link_id element and clicks it to execute the js
-var link = WDS.browser.findElement(pkg.By.id(&apos;link_id&apos;));
-link.click();
-
-//This is the excepted url to compare to
-var url = &apos;https://www.llbeanrewards.com/apply/Landing.action?campaignId=${campaign_id}&amp;cellNumber=${cell_code}&amp;storenumber=${ipad_code}&apos;;
-//Url that the js generated
-var browser_url = WDS.browser.getCurrentUrl();
-
-WDS.log.info(&apos;Expected URL: &apos; + url);
-WDS.log.info(&apos;Current  URL: &apos; + browser_url);
-
-if(url!=browser_url){
+} catch(err) {
     WDS.sampleResult.successful = false;
-    WDS.sampleResult.responseMessage = &apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;+&apos;\tURL = &apos;+browser_url;
-    WDS.log.info(&apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;); 
-}else{
-    WDS.log.info(&apos;SUCCESS!\n&apos;); 
-    WDS.sampleResult.successful = true;
+    vars.put(&apos;pageNotLoaded&apos;,true);
+    WDS.sampleResult.responseMessage = &apos;ERROR: couldn\&apos;t find link_id. Will try again \n&apos;+&apos;\tURL = &apos;+browser_url;
+    WDS.log.info(&apos;ERROR: couldn\&apos;t find link_id.\n&apos;+err); 
 }
+
+WDS.log.info(vars.get(&apos;pageNotLoaded&apos;)); 
 
 
 WDS.sampleResult.sampleEnd();
@@ -114,57 +132,62 @@ WDS.sampleResult.sampleEnd();
           <stringProp name="WebDriverSampler.language">javascript</stringProp>
         </com.googlecode.jmeter.plugins.webdriver.sampler.WebDriverSampler>
         <hashTree/>
-        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
-          <collectionProp name="Asserion.test_strings">
-            <stringProp name="-2142970806">Unable to locate</stringProp>
-          </collectionProp>
-          <stringProp name="Assertion.test_field">Assertion.response_message</stringProp>
-          <boolProp name="Assertion.assume_success">false</boolProp>
-          <intProp name="Assertion.test_type">6</intProp>
-        </ResponseAssertion>
-        <hashTree/>
-        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If unable to find link_id" enabled="true">
-          <stringProp name="IfController.condition">!${JMeterThread.last_sample_ok}</stringProp>
-          <boolProp name="IfController.evaluateAll">false</boolProp>
-        </IfController>
+        <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+          <stringProp name="WhileController.condition">${pageNotLoaded}</stringProp>
+        </WhileController>
         <hashTree>
           <com.googlecode.jmeter.plugins.webdriver.sampler.WebDriverSampler guiclass="com.googlecode.jmeter.plugins.webdriver.sampler.gui.WebDriverSamplerGui" testclass="com.googlecode.jmeter.plugins.webdriver.sampler.WebDriverSampler" testname="Retest. iPad #${ipad_code}" enabled="true">
             <stringProp name="WebDriverSampler.script">//Import selenium, webdriver, and sets a wait time
 var pkg = JavaImporter(org.openqa.selenium);
 var support_ui = JavaImporter(org.openqa.selenium.support.ui.WebDriverWait);
-//var wait = new support_ui.WebDriverWait(WDS.browser, 60);
+var wait = new support_ui.WebDriverWait(WDS.browser, 60);
 
 WDS.log.info(&apos;&lt;&lt;&lt; Last request had status 500. Repeating request &gt;&gt;&gt;&apos;);
+
+var vars = org.apache.jmeter.threads.JMeterContextService.getContext().getVariables()
+
 WDS.sampleResult.sampleStart();
 
-//Gets the url that the store has
-WDS.browser.get(&apos;http://${env}.llbean.com/shop/retailKiosk.html?qs=${ipad_code}-kiosk&apos;);
-WDS.log.info(&apos;&lt;&lt;&lt; Store #${ipad_code} &gt;&gt;&gt;&apos;);
+try{
+    
+    //Gets the url that the store has
+    WDS.browser.get(&apos;http://${env}.llbean.com/shop/retailKiosk.html?qs=${ipad_code}-kiosk&apos;);
+    WDS.log.info(&apos;&lt;&lt;&lt; Store #${ipad_code} &gt;&gt;&gt;&apos;);
+    
+    //Finds the link_id element and clicks it to execute the js
+    var link = WDS.browser.findElement(pkg.By.id(&apos;link_id&apos;));
+    link.click();
+    
+    //This is the excepted url to compare to
+    var url = &apos;https://www.llbeanrewards.com/apply/Landing.action?campaignId=${campaign_id}&amp;cellNumber=${cell_code}&amp;storenumber=${ipad_code}&apos;;
+    //Url that the js generated
+    var browser_url = WDS.browser.getCurrentUrl();
+    
+    WDS.log.info(&apos;Expected URL: &apos; + url);
+    WDS.log.info(&apos;Current  URL: &apos; + browser_url);
+    
+    if(url!=browser_url){
+        WDS.sampleResult.successful = false;
+        WDS.sampleResult.responseMessage = &apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;+&apos;\tURL = &apos;+browser_url;
+        WDS.log.info(&apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;); 
+    }else{
+        WDS.log.info(&apos;SUCCESS!\n&apos;); 
+        WDS.sampleResult.successful = true;
+    }
+    
+    vars.put(&apos;pageNotLoaded&apos;,false);
 
-//Finds the link_id element and clicks it to execute the js
-var link = WDS.browser.findElement(pkg.By.id(&apos;link_id&apos;));
-link.click();
-
-//This is the excepted url to compare to
-var url = &apos;https://www.llbeanrewards.com/apply/Landing.action?campaignId=${campaign_id}&amp;cellNumber=${cell_code}&amp;storenumber=${ipad_code}&apos;;
-//Url that the js generated
-var browser_url = WDS.browser.getCurrentUrl();
-
-WDS.log.info(&apos;Expected URL: &apos; + url);
-WDS.log.info(&apos;Current  URL: &apos; + browser_url);
-
-if(url!=browser_url){
+} catch(err) {
     WDS.sampleResult.successful = false;
-    WDS.sampleResult.responseMessage = &apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;+&apos;\tURL = &apos;+browser_url;
-    WDS.log.info(&apos;FAILED: URLs does not match for iPad #${ipad_code}\n&apos;); 
-}else{
-    WDS.log.info(&apos;SUCCESS!\n&apos;); 
-    WDS.sampleResult.successful = true;
+    vars.put(&apos;pageNotLoaded&apos;,true);
+    WDS.sampleResult.responseMessage = &apos;ERROR: couldn\&apos;t find link_id. Will try again \n&apos;+&apos;\tURL = &apos;+browser_url;
+    WDS.log.info(&apos;ERROR: couldn\&apos;t find link_id.\n&apos;+err); 
 }
 
+WDS.log.info(vars.get(&apos;pageNotLoaded&apos;)); 
 
-WDS.sampleResult.sampleEnd();
-</stringProp>
+
+WDS.sampleResult.sampleEnd();</stringProp>
             <stringProp name="WebDriverSampler.parameters"></stringProp>
             <stringProp name="WebDriverSampler.language">javascript</stringProp>
           </com.googlecode.jmeter.plugins.webdriver.sampler.WebDriverSampler>
