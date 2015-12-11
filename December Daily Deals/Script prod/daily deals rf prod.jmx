@@ -53,7 +53,7 @@
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">${path}${pp_id}${date}</stringProp>
+            <stringProp name="HTTPSampler.path">${path}${pp_id}</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -150,7 +150,7 @@
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">${path}${pp_id}${date}</stringProp>
+            <stringProp name="HTTPSampler.path">${path}${pp_id}</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -247,7 +247,7 @@
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">${r-path}${rp_id}${r-date}</stringProp>
+            <stringProp name="HTTPSampler.path">${r-path}${rp_id}</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -369,7 +369,7 @@ WDS.sampleResult.sampleStart();
 try{
     
     //Gets the page
-    WDS.browser.get(&apos;http://${r-server}${r-path}${rp_id}${r-date}&apos;);
+    WDS.browser.get(&apos;http://${r-server}${r-path}${rp_id}&apos;);
     WDS.log.info(&apos;&lt;&lt;&lt; RP id = ${rp_id}, ${r-day} &gt;&gt;&gt;&apos;);
     
     //Finds the image and clicks it (151211_DecDailyDeal_Generic_desktop_retail.png)
